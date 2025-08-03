@@ -1,0 +1,48 @@
+services:
+  backend:
+    build:
+      context: ./tonix-backend
+
+    env_file: .env
+    restart: always
+
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./tonix-backend
+          target: /tonix-backend/
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+        restart: true
+
+  postgres:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    env_file: .env
+    volumes:
+      - .volumes/postgres:/usr/local/pgsql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  nginx:
+    image: nginx
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+
+    develop:
+      watch:
+        - action: restart
+          path: ./nginx.conf
+
+    depends_on:
+      - backend
