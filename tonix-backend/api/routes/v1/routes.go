@@ -1,12 +1,11 @@
 package v1
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"tonix/backend/api/context"
-	"tonix/backend/api/dto"
+	"tonix/backend/api/dto/requests"
+	"tonix/backend/api/utils"
 
 	"github.com/radyshenkya/stackable"
 )
@@ -35,14 +34,15 @@ var GetIndex = stackable.WrapFunc(
 
 var PostTestMessage = stackable.WrapFunc(
 	func(ctx *context.Context, next func() error) error {
-		body, _ := io.ReadAll(ctx.Request.Body)
-		reqMsg := dto.TestMessage{}
+		reqMsg, err := utils.ParseAndValidateJson(ctx.Request.Body, requests.TestMessage{})
 
-		json.Unmarshal(body, &reqMsg)
+		if err != nil {
+			return err
+		}
 
 		ctx.Response, _ = stackable.JsonResponse(
 			http.StatusOK,
-			dto.TestMessage{Message: reqMsg.Message},
+			requests.TestMessage{Message: reqMsg.Message},
 		)
 
 		return next()
