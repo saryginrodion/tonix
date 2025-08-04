@@ -21,10 +21,14 @@ jobs:
       with:
         go-version: '1.24'
 
-    - name: Build
+    - name: go build
       working-directory: ./tonix-backend
       run: go build -v ./...
 
-    - name: Test
+    - name: go test
       working-directory: ./tonix-backend
       run: go test -v ./...
+
+    - name: go vet
+      working-directory: ./tonix-backend
+      run: go vet -v ./...
