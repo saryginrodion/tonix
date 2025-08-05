@@ -15,6 +15,6 @@ type LocalState struct {
 func (l LocalState) Default() any {
 	return LocalState{
 		LocalRequestId: &middleware.LocalRequestId{},
-		Logger: logging.Logger("local.go"),
+		Logger: logging.LoggerWithOrigin("local.go"),
 	}
 }

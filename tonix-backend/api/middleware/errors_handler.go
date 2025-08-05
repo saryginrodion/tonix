@@ -9,7 +9,7 @@ import (
 	"github.com/radyshenkya/stackable"
 )
 
-var log = logging.Logger("mw/errors_handler.go")
+var log = logging.LoggerWithOrigin("mw/errors_handler.go")
 
 var ErrorsHandlerMiddleware = stackable.WrapFunc(
 	func(ctx *context.Context, next func() error) error {
@@ -21,7 +21,8 @@ var ErrorsHandlerMiddleware = stackable.WrapFunc(
 
 		// Generic error handler
 		// Logging generic error
-		ctx.Local.Logger.WithField("err", err.Error()).Error("Unhandled generic error")
+		ctx.Local.Logger.WithField("origin", "mw/errors_handler.go").WithField("err", err.Error()).Error("Unhandled generic error")
+
 		ctx.Response, _ = stackable.JsonResponse(
 			http.StatusInternalServerError,
 			wrap.ErrorsResponse(err.Error(), []string{err.Error()}),

@@ -5,7 +5,7 @@ import (
 	"tonix/backend/logging"
 )
 
-var logger = logging.Logger("env_vars.go")
+var logger = logging.LoggerWithOrigin("env_vars.go")
 
 type EnvVars struct {
 	POSTGRES_CONNECTION_URL string

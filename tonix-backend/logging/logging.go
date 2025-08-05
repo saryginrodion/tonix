@@ -8,8 +8,12 @@ func baseLogger() *logrus.Logger {
 	return logger;
 }
 
-func Logger(origin string) *logrus.Entry {
+func LoggerWithOrigin(origin string) *logrus.Entry {
 	logger := baseLogger();
 
 	return logger.WithField("origin", origin)
+}
+
+func Logger() *logrus.Logger {
+	return baseLogger()
 }

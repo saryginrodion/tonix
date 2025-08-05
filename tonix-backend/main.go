@@ -5,7 +5,7 @@ import (
 	"tonix/backend/logging"
 )
 
-var logger = logging.Logger("main.go")
+var logger = logging.LoggerWithOrigin("main.go")
 
 func main() {
 	s := routes.HttpServer(":8000")

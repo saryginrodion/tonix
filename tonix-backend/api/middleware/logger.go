@@ -10,7 +10,7 @@ import (
 
 var LoggingMiddleware = stackable.WrapFunc(
 	func(context *context.Context, next func() error) error {
-		context.Local.Logger = logging.Logger("mw/logger.go").WithFields(
+		context.Local.Logger = logging.Logger().WithFields(
 			logrus.Fields{
 				"rid": context.Local.RequestId(),
 				"ip":  context.Request.RemoteAddr,
@@ -19,7 +19,7 @@ var LoggingMiddleware = stackable.WrapFunc(
 
 		err := next()
 
-		context.Local.Logger.Infof("%d - %s %s", context.Response.Status(), context.Request.Method, context.Request.URL.Path)
+		context.Local.Logger.WithField("origin", "mw/logging.go").Infof("%d - %s %s", context.Response.Status(), context.Request.Method, context.Request.URL.Path)
 
 		return err
 	},
