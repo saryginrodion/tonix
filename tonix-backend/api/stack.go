@@ -3,20 +3,30 @@ package api
 import (
 	"tonix/backend/api/context"
 	"tonix/backend/api/middleware"
+	"tonix/backend/database"
 	"tonix/backend/env_vars"
+	"tonix/backend/logging"
 
 	"github.com/radyshenkya/stackable"
 	stackableMiddleware "github.com/radyshenkya/stackable/middleware"
 	"github.com/sirupsen/logrus"
 )
 
+var log = logging.LoggerWithOrigin("stack.go")
+
 var stack *stackable.Stackable[context.SharedState, context.LocalState] = nil
 
 func buildNewStack() stackable.Stackable[context.SharedState, context.LocalState] {
 	envVars := env_vars.LoadEnvVars()
 
+	dbConnection, err := database.Connect(envVars.POSTGRES_CONNECTION_URL)
+	if err != nil {
+		log.Fatal("Failed to connect to db: ", err.Error())
+	}
+
 	shared := &context.SharedState{
 		Environment: *envVars,
+		DB:          dbConnection,
 	}
 
 	newStack := stackable.NewStackable[context.SharedState, context.LocalState](
