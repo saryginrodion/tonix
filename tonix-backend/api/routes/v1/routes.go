@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"tonix/backend/api/context"
 	"tonix/backend/api/dto/requests"
+	wrap "tonix/backend/api/dto/response_wrapper"
 	"tonix/backend/api/utils"
 
 	"github.com/radyshenkya/stackable"
@@ -42,7 +43,7 @@ var PostTestMessage = stackable.WrapFunc(
 
 		ctx.Response, _ = stackable.JsonResponse(
 			http.StatusOK,
-			requests.TestMessage{Message: reqMsg.Message},
+			wrap.OkResponse(requests.TestMessage{Message: reqMsg.Message}),
 		)
 
 		return next()

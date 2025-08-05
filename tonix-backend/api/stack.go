@@ -7,6 +7,7 @@ import (
 
 	"github.com/radyshenkya/stackable"
 	stackableMiddleware "github.com/radyshenkya/stackable/middleware"
+	"github.com/sirupsen/logrus"
 )
 
 var stack *stackable.Stackable[context.SharedState, context.LocalState] = nil
@@ -18,9 +19,11 @@ func buildNewStack() stackable.Stackable[context.SharedState, context.LocalState
 		Environment: *envVars,
 	}
 
-	newStack := stackable.Stackable[context.SharedState, context.LocalState]{
-		Shared: shared,
-	}
+	newStack := stackable.NewStackable[context.SharedState, context.LocalState](
+		shared,
+	)
+
+	newStack.SetLogLevel(logrus.DebugLevel)
 
 	requestIdMW := &stackableMiddleware.RequestIdMiddleware[context.SharedState, context.LocalState]{}
 	corsMW := &stackableMiddleware.CORSMiddleware[context.SharedState, context.LocalState]{
@@ -30,6 +33,7 @@ func buildNewStack() stackable.Stackable[context.SharedState, context.LocalState
 		AllowCredentials: true,
 	}
 
+	newStack.AddHandler(middleware.ErrorsHandlerMiddleware)
 	newStack.AddHandler(requestIdMW)
 	newStack.AddHandler(corsMW)
 	newStack.AddHandler(middleware.LoggingMiddleware)
