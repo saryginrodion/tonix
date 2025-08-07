@@ -8,7 +8,7 @@ import (
 	wrap "tonix/backend/api/dto/response_wrapper"
 	"tonix/backend/api/utils"
 
-	"github.com/radyshenkya/stackable"
+	"github.com/saryginrodion/stackable"
 )
 
 var GetIndex = stackable.WrapFunc(

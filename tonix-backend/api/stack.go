@@ -7,8 +7,8 @@ import (
 	"tonix/backend/env_vars"
 	"tonix/backend/logging"
 
-	"github.com/radyshenkya/stackable"
-	stackableMiddleware "github.com/radyshenkya/stackable/middleware"
+	"github.com/saryginrodion/stackable"
+	stackableMiddleware "github.com/saryginrodion/stackable/middleware"
 	"github.com/sirupsen/logrus"
 )
 

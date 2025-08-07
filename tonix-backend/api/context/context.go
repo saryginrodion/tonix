@@ -1,5 +1,5 @@
 package context
 
-import "github.com/radyshenkya/stackable"
+import "github.com/saryginrodion/stackable"
 
 type Context = stackable.Context[SharedState, LocalState]

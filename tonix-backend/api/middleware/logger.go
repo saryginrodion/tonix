@@ -4,7 +4,7 @@ import (
 	"tonix/backend/api/context"
 	"tonix/backend/logging"
 
-	"github.com/radyshenkya/stackable"
+	"github.com/saryginrodion/stackable"
 	"github.com/sirupsen/logrus"
 )
 
