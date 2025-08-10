@@ -1,0 +1,1 @@
+{"migrations":[{"files":{"up_migration_file":"","down_migration_file":""},"name":"initial","id":0,"prev_migration_id":null,"next_migration_id":1},{"files":{"up_migration_file":"1_init_up.sql","down_migration_file":"1_init_down.sql"},"name":"init","id":1,"prev_migration_id":0,"next_migration_id":null}],"migren_version":"0.1.0","migrations_start_id":null,"migrations_counter":1}

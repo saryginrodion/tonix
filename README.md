@@ -13,8 +13,9 @@ Used technologies for frontend:
 Used technologies for backend:
 - [go](https://go.dev/) - language for backend
 - [logrus](https://github.com/sirupsen/logrus) - logging for go
+- [pgx](https://github.com/jackc/pgx) - postgresql driver
 - [validator](https://github.com/go-playground/validator) - library for validation
-- [stackable](https://github.com/radyshenkya/stackable) - my small go library for stacking middlewares for std http server
+- [stackable](https://github.com/saryginrodion/stackable) - my small go library for stacking middlewares for std http server
 - [postgresql](https://www.postgresql.org/) - database
 
 Also used:
