@@ -34,3 +34,21 @@ func ToSelfUserView(u *model.User) SelfUserView {
 		IdentityPhotoId:    utils.NullableToString(u.IdentityPhotoId),
 	}
 }
+
+type UserView struct {
+	Id                 string  `json:"id"`
+	Username           string  `json:"username"`
+	DisplayableName    string  `json:"displayable_name"`
+	Description        string  `json:"description"`
+	AvatarId           *string `json:"avatar_id"`
+}
+
+func ToUserView(u *model.User) UserView {
+	return UserView{
+		Id:                 u.Id,
+		Username:           u.Username,
+		DisplayableName:    u.DisplayableName,
+		Description:        u.Description,
+		AvatarId:           utils.NullableToString(u.AvatarId),
+	}
+}

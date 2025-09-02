@@ -24,3 +24,19 @@ var ProfileSelf = stackable.WrapFunc(
 		return next()
 	},
 )
+
+var Profile = stackable.WrapFunc(
+	func(ctx *context.Context, next func() error) error {
+		users := model.Users(ctx.Shared.DB)
+		userId := ctx.Request.PathValue("id")
+
+		user, err := users.ById(userId)
+		if err != nil {
+			return err
+		}
+
+		ctx.Response, _ = stackable.JsonResponse(http.StatusOK, view.ToUserView(user))
+
+		return next()
+	},
+)

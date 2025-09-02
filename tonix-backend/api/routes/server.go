@@ -19,6 +19,7 @@ func HttpServer(addr string) *http.Server {
 
 	// profile
 	http.Handle("GET /api/v1/profile/self", protectedStack.AddUniqueHandler(v1.ProfileSelf))
+	http.Handle("GET /api/v1/profile/{id}", stack.AddUniqueHandler(v1.Profile))
 
 	s := &http.Server{
 		Addr: addr,

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	wrap "tonix/backend/api/dto/response_wrapper"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/jackc/pgx"
 	"github.com/saryginrodion/stackable"
 )
 
@@ -45,6 +47,29 @@ var ErrorsHandlerMiddleware = stackable.WrapFunc(
 			ctx.Response, _ = stackable.JsonResponse(
 				apiError.Status,
 				wrap.ErrorsResponse(err.Error(), err.Error()),
+			)
+			return nil
+		}
+
+		// PGX errors
+		var pgxError pgx.PgError
+		if errors.As(err, &pgxError) {
+			switch pgxError.Code {
+			// INVALID TEXT REPRESENTATION
+			case "22P02":
+				ctx.Response, _ = stackable.JsonResponse(
+					http.StatusUnprocessableEntity,
+					wrap.ErrorsResponse("Invalid Text Representation", err.Error()),
+				)
+				return nil
+			}
+		}
+
+		// SQL no rows error
+		if errors.Is(err, sql.ErrNoRows) {
+			ctx.Response, _ = stackable.JsonResponse(
+				http.StatusNotFound,
+				wrap.ErrorsResponse("Not Found", err.Error()),
 			)
 			return nil
 		}
