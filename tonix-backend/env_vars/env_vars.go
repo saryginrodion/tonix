@@ -2,12 +2,17 @@ package env_vars
 
 import (
 	"os"
+	"strconv"
+	"time"
 	"tonix/backend/logging"
 )
 
 var logger = logging.LoggerWithOrigin("env_vars.go")
 
 type EnvVars struct {
+	JWT_SECRET string
+	JWT_ACCESS_COOLDOWN_DURATION time.Duration
+	JWT_REFRESH_COOLDOWN_DURATION time.Duration
 	POSTGRES_CONNECTION_URL string
 }
 
@@ -15,14 +20,36 @@ func loadEnvVar(key string) string {
 	val, isExists := os.LookupEnv(key);
 
 	if !isExists {
-		logger.Fatalf("Environment variable is unset")
+		logger.Fatalln("Environment variable is unset: ", key)
 	}
 
 	return val
 }
 
+func StrToInt(v string) int {
+	res, err := strconv.Atoi(v)
+	if err != nil {
+		logger.Panicln("Failed to convert value ", v, " to int")
+	}
+
+	return res
+}
+
+func ParseDuration(v string) time.Duration {
+	dur, err := time.ParseDuration(v)
+
+	if err != nil {
+		logger.Panicln("Failed to parse duration: ", v)
+	}
+
+	return dur
+}
+
 func LoadEnvVars() *EnvVars {
 	return &EnvVars{
-		POSTGRES_CONNECTION_URL: loadEnvVar("POSTGRES_CONNECTION_URL"),
+		POSTGRES_CONNECTION_URL:      loadEnvVar("POSTGRES_CONNECTION_URL"),
+		JWT_SECRET:                   loadEnvVar("JWT_SECRET"),
+		JWT_ACCESS_COOLDOWN_DURATION:  ParseDuration(loadEnvVar("JWT_ACCESS_COOLDOWN_DURATION")),
+		JWT_REFRESH_COOLDOWN_DURATION: ParseDuration(loadEnvVar("JWT_REFRESH_COOLDOWN_DURATION")),
 	}
 }

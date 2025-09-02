@@ -43,10 +43,10 @@ func buildNewStack() stackable.Stackable[context.SharedState, context.LocalState
 		AllowCredentials: true,
 	}
 
+	newStack.AddHandler(middleware.LoggingMiddleware)
 	newStack.AddHandler(middleware.ErrorsHandlerMiddleware)
 	newStack.AddHandler(requestIdMW)
 	newStack.AddHandler(corsMW)
-	newStack.AddHandler(middleware.LoggingMiddleware)
 
 	return newStack
 }

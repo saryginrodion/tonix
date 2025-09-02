@@ -1,13 +1,8 @@
 package v1
 
 import (
-	"fmt"
 	"net/http"
 	"tonix/backend/api/context"
-	"tonix/backend/api/dto/requests"
-	wrap "tonix/backend/api/dto/response_wrapper"
-	"tonix/backend/api/utils"
-
 	"github.com/saryginrodion/stackable"
 )
 
@@ -26,24 +21,7 @@ var GetIndex = stackable.WrapFunc(
 		ctx.Response = stackable.NewHttpResponse(
 			http.StatusOK,
 			"text/html",
-			fmt.Sprintf("<h1>Hello world!</h1>POSTGRES_CONNECTION_URL=%s", ctx.Shared.Environment.POSTGRES_CONNECTION_URL),
-		)
-
-		return next()
-	},
-)
-
-var PostTestMessage = stackable.WrapFunc(
-	func(ctx *context.Context, next func() error) error {
-		reqMsg, err := utils.ParseAndValidateJson(ctx.Request.Body, requests.TestMessage{})
-
-		if err != nil {
-			return err
-		}
-
-		ctx.Response, _ = stackable.JsonResponse(
-			http.StatusOK,
-			wrap.OkResponse(requests.TestMessage{Message: reqMsg.Message}),
+			"<h1>Hello from Tonix Backend!</h1>",
 		)
 
 		return next()

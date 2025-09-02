@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"tonix/backend/api/context"
+	"tonix/backend/api/dto"
 	wrap "tonix/backend/api/dto/response_wrapper"
 
 	"github.com/go-playground/validator/v10"
@@ -33,6 +34,16 @@ var ErrorsHandlerMiddleware = stackable.WrapFunc(
 		if errors.As(err, &validator.ValidationErrors{}) {
 			ctx.Response, _ = stackable.JsonResponse(
 				http.StatusUnprocessableEntity,
+				wrap.ErrorsResponse(err.Error(), err.Error()),
+			)
+			return nil
+		}
+
+		// Api known errors
+		var apiError *dto.ApiError
+		if errors.As(err, &apiError) {
+			ctx.Response, _ = stackable.JsonResponse(
+				apiError.Status,
 				wrap.ErrorsResponse(err.Error(), err.Error()),
 			)
 			return nil
