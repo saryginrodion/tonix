@@ -22,8 +22,7 @@ type TokenPair struct {
 	Refresh jwt.TokenPayload[jwt.UserInfo]
 }
 
-func CreateTokenPair(user *model.User) (TokenPair, error) {
-	envVars := env_vars.LoadEnvVars()
+func CreateTokenPair(user *model.User, envVars env_vars.EnvVars) (TokenPair, error) {
 	tokenUuid, _ := uuid.NewV4()
 	userInfo := jwt.UserInfo{
 		Uid: user.Id,
@@ -77,14 +76,13 @@ var Registration = stackable.WrapFunc(
 		}
 
 		// Creating cookie pair
-		tokenPair, err := CreateTokenPair(user)
+		tokenPair, err := CreateTokenPair(user, ctx.Shared.Environment)
 		if err != nil {
 			return err
 		}
 
-		envVars := env_vars.LoadEnvVars()
-		accessToken, err := jwt.GenerateToken(tokenPair.Access, envVars.JWT_SECRET)
-		refreshToken, err := jwt.GenerateToken(tokenPair.Refresh, envVars.JWT_SECRET)
+		accessToken, err := jwt.GenerateToken(tokenPair.Access, ctx.Shared.Environment.JWT_SECRET)
+		refreshToken, err := jwt.GenerateToken(tokenPair.Refresh, ctx.Shared.Environment.JWT_SECRET)
 
 		if err != nil {
 			return err
@@ -143,14 +141,13 @@ var Login = stackable.WrapFunc(
 		}
 
 		// Creating cookie pair
-		tokenPair, err := CreateTokenPair(user)
+		tokenPair, err := CreateTokenPair(user, ctx.Shared.Environment)
 		if err != nil {
 			return err
 		}
 
-		envVars := env_vars.LoadEnvVars()
-		accessToken, err := jwt.GenerateToken(tokenPair.Access, envVars.JWT_SECRET)
-		refreshToken, err := jwt.GenerateToken(tokenPair.Refresh, envVars.JWT_SECRET)
+		accessToken, err := jwt.GenerateToken(tokenPair.Access, ctx.Shared.Environment.JWT_SECRET)
+		refreshToken, err := jwt.GenerateToken(tokenPair.Refresh, ctx.Shared.Environment.JWT_SECRET)
 
 		if err != nil {
 			return err
