@@ -5,7 +5,7 @@ import (
 	"tonix/backend/model"
 )
 
-type UserView struct {
+type SelfUserView struct {
 	Id                 string  `json:"id"`
 	Email              string  `json:"email"`
 	Username           string  `json:"username"`
@@ -19,8 +19,8 @@ type UserView struct {
 	IdentityPhotoId    *string `json:"identity_photo_id"`
 }
 
-func UserToView(u *model.User) UserView {
-	return UserView{
+func ToSelfUserView(u *model.User) SelfUserView {
+	return SelfUserView{
 		Id:                 u.Id,
 		Email:              u.Email,
 		Username:           u.Username,

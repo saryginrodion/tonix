@@ -76,7 +76,7 @@ func ParseToken[T any](token string, secret string) (*Token[T], error) {
 	}
 
 	headerAndPayloadParts := parts[0] + "." + parts[1]
-	sign := utils.HmacSha256(headerAndPayloadParts, secret)
+	sign := utils.ToBase64(utils.HmacSha256(headerAndPayloadParts, secret))
 
 	if sign != parts[2] {
 		return nil, NewJWTError("JWT sign check is failed")

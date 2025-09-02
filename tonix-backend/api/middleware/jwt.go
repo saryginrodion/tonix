@@ -17,7 +17,13 @@ var AccessJWTExtractor = stackable.WrapFunc(
 			return dto.NewApiError(http.StatusUnauthorized, "Failed to read access_token cookie.")
 		}
 
-		jwt.ParseAndVerifyToken[jwt.UserInfo](accessTokenString.Value, jwt.Access, context.Shared.Environment.JWT_SECRET)
+		accessToken, err := jwt.ParseAndVerifyToken[jwt.UserInfo](accessTokenString.Value, jwt.Access, context.Shared.Environment.JWT_SECRET)
+
+		if err != nil {
+			return dto.NewApiError(http.StatusUnauthorized, "Failed to parse/verify access_token")
+		}
+
+		context.Local.AccessJWT = accessToken
 
 		return next()
 	},

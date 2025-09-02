@@ -108,7 +108,7 @@ var Registration = stackable.WrapFunc(
 
 		resp, _ := stackable.JsonResponse(
 			http.StatusOK,
-			wrap.OkResponse(view.UserToView(user)),
+			wrap.OkResponse(view.ToSelfUserView(user)),
 		)
 
 		headers := resp.Headers()
@@ -173,7 +173,7 @@ var Login = stackable.WrapFunc(
 
 		resp, _ := stackable.JsonResponse(
 			http.StatusOK,
-			wrap.OkResponse(view.UserToView(user)),
+			wrap.OkResponse(view.ToSelfUserView(user)),
 		)
 
 		headers := resp.Headers()
