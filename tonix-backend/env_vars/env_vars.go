@@ -10,14 +10,15 @@ import (
 var logger = logging.LoggerWithOrigin("env_vars.go")
 
 type EnvVars struct {
-	JWT_SECRET string
-	JWT_ACCESS_COOLDOWN_DURATION time.Duration
+	JWT_SECRET                    string
+	JWT_ACCESS_COOLDOWN_DURATION  time.Duration
 	JWT_REFRESH_COOLDOWN_DURATION time.Duration
-	POSTGRES_CONNECTION_URL string
+	REDIS_CONNECTION_URL          string
+	POSTGRES_CONNECTION_URL       string
 }
 
 func loadEnvVar(key string) string {
-	val, isExists := os.LookupEnv(key);
+	val, isExists := os.LookupEnv(key)
 
 	if !isExists {
 		logger.Fatalln("Environment variable is unset: ", key)
@@ -47,8 +48,9 @@ func ParseDuration(v string) time.Duration {
 
 func LoadEnvVars() *EnvVars {
 	return &EnvVars{
-		POSTGRES_CONNECTION_URL:      loadEnvVar("POSTGRES_CONNECTION_URL"),
-		JWT_SECRET:                   loadEnvVar("JWT_SECRET"),
+		POSTGRES_CONNECTION_URL:       loadEnvVar("POSTGRES_CONNECTION_URL"),
+		REDIS_CONNECTION_URL:          loadEnvVar("REDIS_CONNECTION_URL"),
+		JWT_SECRET:                    loadEnvVar("JWT_SECRET"),
 		JWT_ACCESS_COOLDOWN_DURATION:  ParseDuration(loadEnvVar("JWT_ACCESS_COOLDOWN_DURATION")),
 		JWT_REFRESH_COOLDOWN_DURATION: ParseDuration(loadEnvVar("JWT_REFRESH_COOLDOWN_DURATION")),
 	}

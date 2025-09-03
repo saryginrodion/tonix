@@ -28,12 +28,10 @@ func CreateTokenPair(user *model.User, envVars env_vars.EnvVars) (TokenPair, err
 		Uid: user.Id,
 	}
 
-	accessExpTime := time.Now()
-	accessExpTime.Add(envVars.JWT_ACCESS_COOLDOWN_DURATION)
+	accessExpTime := time.Now().Add(envVars.JWT_ACCESS_COOLDOWN_DURATION)
 	accessTokenPayload := jwt.NewTokenPayload(userInfo, accessExpTime, jwt.Access, tokenUuid.String())
 
-	refreshExpTime := time.Now()
-	refreshExpTime.Add(envVars.JWT_REFRESH_COOLDOWN_DURATION)
+	refreshExpTime := time.Now().Add(envVars.JWT_REFRESH_COOLDOWN_DURATION)
 	refreshTokenPayload := jwt.NewTokenPayload(userInfo, refreshExpTime, jwt.Refresh, tokenUuid.String())
 
 	return TokenPair{
@@ -88,10 +86,14 @@ var Registration = stackable.WrapFunc(
 			return err
 		}
 
+		tokenWhitelist := model.TokenWhitelist(ctx.Shared.RedisClient)
+		tokenWhitelist.Add(tokenPair.Access.TokenId, ctx.Shared.Environment.JWT_REFRESH_COOLDOWN_DURATION)
+
 		accessCookie := http.Cookie{
 			Name:     "access_token",
 			Value:    accessToken,
 			Path:     "/",
+			Expires:  time.Now().Add(ctx.Shared.Environment.JWT_ACCESS_COOLDOWN_DURATION),
 			Secure:   false,
 			HttpOnly: true,
 			SameSite: 0,
@@ -100,6 +102,7 @@ var Registration = stackable.WrapFunc(
 		refreshCookie := http.Cookie{
 			Name:     "refresh_token",
 			Value:    refreshToken,
+			Expires:  time.Now().Add(ctx.Shared.Environment.JWT_REFRESH_COOLDOWN_DURATION),
 			Path:     "/",
 			Secure:   false,
 			HttpOnly: true,
@@ -109,6 +112,48 @@ var Registration = stackable.WrapFunc(
 		resp, _ := stackable.JsonResponse(
 			http.StatusOK,
 			wrap.OkResponse(view.ToSelfUserView(user)),
+		)
+
+		headers := resp.Headers()
+		headers.Add("Set-Cookie", accessCookie.String())
+		headers.Add("Set-Cookie", refreshCookie.String())
+
+		resp.SetHeaders(headers)
+
+		ctx.Response = resp
+
+		return next()
+	},
+)
+
+var Logout = stackable.WrapFunc(
+	func(ctx *context.Context, next func() error) error {
+		tokenWhitelist := model.TokenWhitelist(ctx.Shared.RedisClient)
+		tokenWhitelist.Remove(ctx.Local.AccessJWT.Payload.TokenId)
+
+		accessCookie := http.Cookie{
+			Name:     "access_token",
+			Expires:  time.Now(),
+			Value:    "",
+			Path:     "/",
+			Secure:   false,
+			HttpOnly: true,
+			SameSite: 0,
+		}
+
+		refreshCookie := http.Cookie{
+			Name:     "refresh_token",
+			Expires:  time.Now(),
+			Value:    "",
+			Path:     "/",
+			Secure:   false,
+			HttpOnly: true,
+			SameSite: 0,
+		}
+
+		resp, _ := stackable.JsonResponse(
+			http.StatusOK,
+			wrap.OkResponse(struct{}{}),
 		)
 
 		headers := resp.Headers()
@@ -149,6 +194,9 @@ var Login = stackable.WrapFunc(
 		accessToken, err := jwt.GenerateToken(tokenPair.Access, ctx.Shared.Environment.JWT_SECRET)
 		refreshToken, err := jwt.GenerateToken(tokenPair.Refresh, ctx.Shared.Environment.JWT_SECRET)
 
+		tokenWhitelist := model.TokenWhitelist(ctx.Shared.RedisClient)
+		tokenWhitelist.Add(tokenPair.Access.TokenId, ctx.Shared.Environment.JWT_REFRESH_COOLDOWN_DURATION)
+
 		if err != nil {
 			return err
 		}
@@ -157,6 +205,7 @@ var Login = stackable.WrapFunc(
 			Name:     "access_token",
 			Value:    accessToken,
 			Path:     "/",
+			Expires:  time.Now().Add(ctx.Shared.Environment.JWT_ACCESS_COOLDOWN_DURATION),
 			Secure:   false,
 			HttpOnly: true,
 			SameSite: 0,
@@ -165,6 +214,70 @@ var Login = stackable.WrapFunc(
 		refreshCookie := http.Cookie{
 			Name:     "refresh_token",
 			Value:    refreshToken,
+			Expires:  time.Now().Add(ctx.Shared.Environment.JWT_REFRESH_COOLDOWN_DURATION),
+			Path:     "/",
+			Secure:   false,
+			HttpOnly: true,
+			SameSite: 0,
+		}
+
+		resp, _ := stackable.JsonResponse(
+			http.StatusOK,
+			wrap.OkResponse(view.ToSelfUserView(user)),
+		)
+
+		headers := resp.Headers()
+		headers.Add("Set-Cookie", accessCookie.String())
+		headers.Add("Set-Cookie", refreshCookie.String())
+
+		resp.SetHeaders(headers)
+
+		ctx.Response = resp
+
+		return next()
+	},
+)
+
+var Refresh = stackable.WrapFunc(
+	func(ctx *context.Context, next func() error) error {
+		tokenWhitelist := model.TokenWhitelist(ctx.Shared.RedisClient)
+		users := model.Users(ctx.Shared.DB)
+		user, err := users.ById(ctx.Local.RefreshJWT.Payload.Data.Uid)
+		if err != nil {
+			return err
+		}
+
+		tokenWhitelist.Remove(ctx.Local.RefreshJWT.Payload.TokenId)
+
+		// Creating cookie pair
+		tokenPair, err := CreateTokenPair(user, ctx.Shared.Environment)
+		if err != nil {
+			return err
+		}
+
+		accessToken, err := jwt.GenerateToken(tokenPair.Access, ctx.Shared.Environment.JWT_SECRET)
+		refreshToken, err := jwt.GenerateToken(tokenPair.Refresh, ctx.Shared.Environment.JWT_SECRET)
+
+		tokenWhitelist.Add(tokenPair.Access.TokenId, ctx.Shared.Environment.JWT_REFRESH_COOLDOWN_DURATION)
+
+		if err != nil {
+			return err
+		}
+
+		accessCookie := http.Cookie{
+			Name:     "access_token",
+			Value:    accessToken,
+			Path:     "/",
+			Expires:  time.Now().Add(ctx.Shared.Environment.JWT_ACCESS_COOLDOWN_DURATION),
+			Secure:   false,
+			HttpOnly: true,
+			SameSite: 0,
+		}
+
+		refreshCookie := http.Cookie{
+			Name:     "refresh_token",
+			Value:    refreshToken,
+			Expires:  time.Now().Add(ctx.Shared.Environment.JWT_REFRESH_COOLDOWN_DURATION),
 			Path:     "/",
 			Secure:   false,
 			HttpOnly: true,

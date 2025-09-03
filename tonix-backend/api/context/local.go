@@ -10,14 +10,15 @@ import (
 
 type LocalState struct {
 	*middleware.LocalRequestId
-	Logger *logrus.Entry
-	AccessJWT *jwt.Token[jwt.UserInfo]
+	Logger     *logrus.Entry
+	AccessJWT  *jwt.Token[jwt.UserInfo]
+	RefreshJWT *jwt.Token[jwt.UserInfo]
 }
 
 func (l LocalState) Default() any {
 	return LocalState{
 		LocalRequestId: &middleware.LocalRequestId{},
-		Logger: logging.LoggerWithOrigin("local.go"),
-		AccessJWT: nil,
+		Logger:         logging.LoggerWithOrigin("local.go"),
+		AccessJWT:      nil,
 	}
 }

@@ -24,9 +24,15 @@ func buildNewStack() stackable.Stackable[context.SharedState, context.LocalState
 		log.Fatal("Failed to connect to db: ", err.Error())
 	}
 
+	redisClient, err := database.RedisConnect(envVars.REDIS_CONNECTION_URL)
+	if err != nil {
+		log.Fatal("Failed to connect to redis: ", err.Error())
+	}
+
 	shared := &context.SharedState{
-		Environment: *envVars,
-		DB:          dbConnection,
+		Environment:  *envVars,
+		DB:           dbConnection,
+		RedisClient:  redisClient,
 	}
 
 	newStack := stackable.NewStackable[context.SharedState, context.LocalState](

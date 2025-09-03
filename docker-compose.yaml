@@ -14,6 +14,9 @@ services:
           target: /tonix-backend/
 
     depends_on:
+      redis:
+        condition: service_healthy
+        restart: true
       migrations:
         condition: service_completed_successfully
         restart: true
@@ -45,7 +48,21 @@ services:
       postgres:
         condition: service_healthy
 
-
+  redis:
+    image: redis:latest
+    command: redis-server --appendonly yes --save 60 1 --loglevel verbose --maxmemory 128mb --requirepass "password"
+    tty: true
+    restart: always
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "password", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - ./.volumes/redis:/data
 
   nginx:
     image: nginx
