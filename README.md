@@ -5,9 +5,11 @@ Made as a pet project for learning purposes
 
 # Stack
 Used technologies for frontend:
+- [vite](https://vite.dev) - build tool
 - [typescript](https://nextjs.org/) - language for frontend
-- [nextjs](https://nextjs.org/) - react framework
+- [react](https://react.dev/) - component framework
 - [swr](https://swr.vercel.app) - data fetching
+- [zustand](https://zustand-demo.pmnd.rs/) - state manager
 - [tailwindcss](https://tailwindcss.com/) - styling
 
 Used technologies for backend:

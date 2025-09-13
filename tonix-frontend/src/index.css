@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+@import "tailwindcss";
+
+@theme {
+    /* Colors */
+    --color-error: #E40808;
+    --color-primary: #000000;
+    --color-primary-dimmed: #161616;
+    --color-secondary: #585858;
+    --color-tertiary: #A3A3A3;
+    --color-light: #DBDBDB;
+    --color-white: #F8F2F2; /* none */
+
+    --color-neutral: #6E51E0;
+    --color-neutral-hl: #7656F3;
+
+    --color-success: #18DC7E;
+    --color-success-hl: #35E992;
+
+    --color-warn: #F99F39;
+    --color-warn-hl: #FFE07C;
+
+    --color-error: #E40808;
+    --color-error-hl: #FF3131;
+
+
+    /* Fonts */
+    --font-main: "Ubuntu", sans-serif;
+}
+
+.main-container {
+    @apply px-[120px] flex flex-col gap-2
+}
