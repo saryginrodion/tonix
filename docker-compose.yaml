@@ -13,6 +13,9 @@ services:
           path: ./tonix-backend
           target: /tonix-backend/
 
+    volumes:
+      - .volumes/uploads:/uploads
+
     depends_on:
       redis:
         condition: service_healthy
