@@ -18,7 +18,8 @@ import (
 	"github.com/saryginrodion/stackable"
 )
 
-const ALLOWED_MIMETYPES string = "audio/ogg;audio/wav;audio/mpeg;image/jpeg;image/png;/image/gif"
+
+const ALLOWED_MIMETYPES string = "audio/ogg;audio/wave;audio/wav;audio/mpeg;audio/mpeg3;image/jpeg;image/png;image/gif"
 
 var UploadFile = stackable.WrapFunc(
 	func(ctx *context.Context, next func() error) error {
@@ -68,7 +69,6 @@ var UploadFile = stackable.WrapFunc(
 		if _, err = io.Copy(dst, file); err != nil {
 			return err
 		}
-
 
 		// Adding to file DB
 		files := model.Files(ctx.Shared.DB)
