@@ -24,7 +24,7 @@ func Files(db *sqlx.DB) *FileFeatures {
 }
 
 func (f *FileFeatures) AddFile(file *File) (*string, error) {
-	query, err := f.DB.NamedQuery("INSERT INTO file (author_id, filename, path, mimetype) VALUES (:author_id, :filename, :path, :mimetype) RETURNING id", file)
+	query, err := f.DB.NamedQuery("INSERT INTO files (author_id, filename, path, mimetype) VALUES (:author_id, :filename, :path, :mimetype) RETURNING id", file)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (f *FileFeatures) AddFile(file *File) (*string, error) {
 
 func (f *FileFeatures) ById(fileId string) (*File, error) {
 	var file File
-	if err := f.DB.Get(&file, "SELECT * FROM file WHERE id = $1", fileId); err != nil {
+	if err := f.DB.Get(&file, "SELECT * FROM files WHERE id = $1", fileId); err != nil {
 		return nil, err
 	}
 
@@ -49,7 +49,7 @@ func (f *FileFeatures) ById(fileId string) (*File, error) {
 
 func (f *FileFeatures) IsAuthor(userId string, fileId string) (bool, error) {
 	var fileIds []string = make([]string, 1)
-	if err := f.DB.Select(&fileIds, "SELECT * FROM file WHERE author_id = $1", userId); err != nil {
+	if err := f.DB.Select(&fileIds, "SELECT * FROM files WHERE author_id = $1", userId); err != nil {
 		return false, err
 	}
 
