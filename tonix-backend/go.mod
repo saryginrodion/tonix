@@ -5,7 +5,7 @@ go 1.24.5
 require (
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/jackc/pgx v3.6.2+incompatible
-	github.com/saryginrodion/stackable v0.0.9
+	github.com/saryginrodion/stackable v0.0.10
 	github.com/sirupsen/logrus v1.9.3
 )
 

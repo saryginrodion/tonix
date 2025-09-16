@@ -23,6 +23,10 @@ func HttpServer(addr string) *http.Server {
 	http.Handle("GET /api/v1/profile/self", protectedStack.AddUniqueHandler(v1.ProfileSelf))
 	http.Handle("GET /api/v1/profile/{id}", stack.AddUniqueHandler(v1.Profile))
 
+	// file
+	http.Handle("GET /api/v1/file/{id}", stack.AddUniqueHandler(v1.ReadFile))
+	http.Handle("POST /api/v1/file", protectedStack.AddUniqueHandler(v1.UploadFile))
+
 	s := &http.Server{
 		Addr: addr,
 	}

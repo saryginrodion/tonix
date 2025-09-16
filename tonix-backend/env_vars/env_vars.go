@@ -15,6 +15,8 @@ type EnvVars struct {
 	JWT_REFRESH_COOLDOWN_DURATION time.Duration
 	REDIS_CONNECTION_URL          string
 	POSTGRES_CONNECTION_URL       string
+	UPLOADS_DIRECTORY             string
+	UPLOADS_MAX_SIZE_MB           int
 }
 
 func loadEnvVar(key string) string {
@@ -27,7 +29,7 @@ func loadEnvVar(key string) string {
 	return val
 }
 
-func StrToInt(v string) int {
+func ParseInt(v string) int {
 	res, err := strconv.Atoi(v)
 	if err != nil {
 		logger.Panicln("Failed to convert value ", v, " to int")
@@ -53,5 +55,7 @@ func LoadEnvVars() *EnvVars {
 		JWT_SECRET:                    loadEnvVar("JWT_SECRET"),
 		JWT_ACCESS_COOLDOWN_DURATION:  ParseDuration(loadEnvVar("JWT_ACCESS_COOLDOWN_DURATION")),
 		JWT_REFRESH_COOLDOWN_DURATION: ParseDuration(loadEnvVar("JWT_REFRESH_COOLDOWN_DURATION")),
+		UPLOADS_DIRECTORY:             loadEnvVar("UPLOADS_DIRECTORY"),
+		UPLOADS_MAX_SIZE_MB:           ParseInt(loadEnvVar("UPLOADS_MAX_SIZE_MB")),
 	}
 }
