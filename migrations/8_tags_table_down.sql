@@ -1,5 +1,5 @@
 -- 8 - tags_table down query
-DROP TYPE tag_type;
+DROP TABLE tags;
 
 -- migren:split
-DROP TABLE tags;
+DROP TYPE tag_type;

@@ -27,6 +27,9 @@ func HttpServer(addr string) *http.Server {
 	http.Handle("GET /api/v1/file/{id}", stack.AddUniqueHandler(v1.ReadFile))
 	http.Handle("POST /api/v1/file", protectedStack.AddUniqueHandler(v1.UploadFile))
 
+	// tags
+	http.Handle("GET /api/v1/tag", stack.AddUniqueHandler(v1.SearchTags))
+
 	s := &http.Server{
 		Addr: addr,
 	}
