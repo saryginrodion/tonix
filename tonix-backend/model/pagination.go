@@ -1,8 +1,6 @@
 package model
 
 import (
-	"fmt"
-
 	"github.com/jmoiron/sqlx"
 )
 
@@ -24,14 +22,14 @@ type PaginatorResult[T any] struct {
 }
 
 type Paginator[T any] struct {
-	db             *sqlx.DB
-	tableName      string
+	db        *sqlx.DB
+	tableName string
 }
 
 func NewPaginator[T any](db *sqlx.DB, tableName string) *Paginator[T] {
 	return &Paginator[T]{
-		db:             db,
-		tableName:      tableName,
+		db:        db,
+		tableName: tableName,
 	}
 }
 
@@ -40,34 +38,26 @@ func NewPaginator[T any](db *sqlx.DB, tableName string) *Paginator[T] {
 // whereConditions - conditions that passed to WHERE. String builded will be:
 //
 // ```sql
-// SELECT * FROM {Paginator.tableName} WHERE {whereConditions} LIMIT ? OFFSET ?
+// SELECT * FROM {Paginator.tableName} {selectPartStatement} LIMIT ? OFFSET ?
 //
-// SELECT COUNT(*) FROM {Paginator.tableName} WHERE {whereConditions}
+// SELECT COUNT(*) FROM {Paginator.tableName} {countSelectPartStatement}
 // ```
-func (p *Paginator[T]) Select(opts PaginationOpts, whereConditions string, orderBy string, args ...any) (*PaginatorResult[T], error) {
+func (p *Paginator[T]) Select(opts PaginationOpts, selectPartStatement string, countSelectPartStatement string, args ...any) (*PaginatorResult[T], error) {
 	var results []T
 	offset := opts.ElementsOnPage * (opts.Page - 1)
-	query := "SELECT * FROM " + p.tableName + " WHERE " + whereConditions
-	if orderBy != "" {
-		query += " ORDER BY " + orderBy
-	}
-	query += " LIMIT ? OFFSET ?"
+	query := "SELECT * FROM " + p.tableName + " " + selectPartStatement + " LIMIT ? OFFSET ?"
 
 	argsWithPagination := args[:]
 	argsWithPagination = append(argsWithPagination, opts.ElementsOnPage)
 	argsWithPagination = append(argsWithPagination, offset)
 
 	query = p.db.Rebind(query)
-	fmt.Println(query, argsWithPagination)
-
 	if err := p.db.Select(&results, query, argsWithPagination...); err != nil {
 		return nil, err
 	}
 
-	countQuery := "SELECT COUNT(*) FROM " + p.tableName + " WHERE " + whereConditions
+	countQuery := "SELECT COUNT(*) FROM " + p.tableName + " " + countSelectPartStatement
 	countQuery = p.db.Rebind(countQuery)
-
-	fmt.Println(countQuery, args)
 
 	row := p.db.QueryRow(countQuery, args...)
 

@@ -73,7 +73,7 @@ func (t *TagFeatures) Search(opts SearchTagsOpts, paginationOpts PaginationOpts)
 	var queryPart string
 	var selectArgs []any
 
-	queryPart += "name LIKE CONCAT('%', ?::text, '%')"
+	queryPart += "WHERE name LIKE CONCAT('%', ?::text, '%')"
 	selectArgs = append(selectArgs, opts.Name)
 
 	if opts.Type != nil {
@@ -81,7 +81,7 @@ func (t *TagFeatures) Search(opts SearchTagsOpts, paginationOpts PaginationOpts)
 		selectArgs = append(selectArgs, *opts.Type)
 	}
 
-	res, err := paginator.Select(paginationOpts, queryPart, "usages DESC", selectArgs...)
+	res, err := paginator.Select(paginationOpts, queryPart+" ORDER BY usages DESC", queryPart, selectArgs...)
 	if err != nil {
 		return nil, err
 	}
