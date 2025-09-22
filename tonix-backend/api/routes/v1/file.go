@@ -18,7 +18,6 @@ import (
 	"github.com/saryginrodion/stackable"
 )
 
-
 const ALLOWED_MIMETYPES string = "audio/ogg;audio/wave;audio/wav;audio/mpeg;audio/mpeg3;image/jpeg;image/png;image/gif"
 
 var UploadFile = stackable.WrapFunc(
@@ -73,7 +72,7 @@ var UploadFile = stackable.WrapFunc(
 		// Adding to file DB
 		files := model.Files(ctx.Shared.DB)
 		uploadedFileId, err := files.AddFile(&model.File{
-			AuthorId: ctx.Local.AccessJWT.Payload.Data.Uid,
+			AuthorId: model.Id(ctx.Local.AccessJWT.Payload.Data.Uid),
 			Path:     filepath.Join(dirName, fileName),
 			Mimetype: mimetype,
 			Filename: fileName,
@@ -84,7 +83,7 @@ var UploadFile = stackable.WrapFunc(
 		}
 
 		// Returning data of new file
-		ctx.Response, _ = stackable.JsonResponse(http.StatusOK, view.FileId{Id: *uploadedFileId})
+		ctx.Response, _ = stackable.JsonResponse(http.StatusOK, view.FileId{Id: string(*uploadedFileId)})
 
 		return next()
 	},
@@ -95,7 +94,7 @@ var ReadFile = stackable.WrapFunc(
 		fileId := ctx.Request.PathValue("id")
 		files := model.Files(ctx.Shared.DB)
 
-		fileData, err := files.ById(fileId)
+		fileData, err := files.ById(model.Id(fileId))
 		if err != nil {
 			return err
 		}

@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	Id                 string         `db:"id"`
+	Id                 Id             `db:"id"`
 	Email              string         `db:"email"`
 	Password           string         `db:"password"`
 	Username           string         `db:"username"`
@@ -31,13 +31,13 @@ func Users(db *sqlx.DB) *UserFeatures {
 	return &UserFeatures{DB: db}
 }
 
-func (f *UserFeatures) New(email string, password string, username string) (*string, error) {
+func (f *UserFeatures) New(email string, password string, username string) (*Id, error) {
 	row := f.DB.QueryRow(
 		`INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING id`,
 		email, password, username,
 	)
 
-	userId := ""
+	var userId Id
 
 	err := row.Scan(&userId)
 
@@ -97,7 +97,7 @@ func (f *UserFeatures) ByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
-func (f *UserFeatures) ById(id string) (*User, error) {
+func (f *UserFeatures) ById(id Id) (*User, error) {
 	user := User{}
 	err := f.DB.Get(&user, "SELECT * FROM users WHERE id = $1", id)
 

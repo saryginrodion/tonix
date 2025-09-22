@@ -25,7 +25,7 @@ type TokenPair struct {
 func CreateTokenPair(user *model.User, envVars env_vars.EnvVars) (TokenPair, error) {
 	tokenUuid, _ := uuid.NewV4()
 	userInfo := jwt.UserInfo{
-		Uid: user.Id,
+		Uid: string(user.Id),
 	}
 
 	accessExpTime := time.Now().Add(envVars.JWT_ACCESS_COOLDOWN_DURATION)
@@ -242,7 +242,7 @@ var Refresh = stackable.WrapFunc(
 	func(ctx *context.Context, next func() error) error {
 		tokenWhitelist := model.TokenWhitelist(ctx.Shared.RedisClient)
 		users := model.Users(ctx.Shared.DB)
-		user, err := users.ById(ctx.Local.RefreshJWT.Payload.Data.Uid)
+		user, err := users.ById(model.Id(ctx.Local.RefreshJWT.Payload.Data.Uid))
 		if err != nil {
 			return err
 		}

@@ -14,7 +14,7 @@ var ProfileSelf = stackable.WrapFunc(
 		users := model.Users(ctx.Shared.DB)
 		userId := ctx.Local.AccessJWT.Payload.Data.Uid
 
-		user, err := users.ById(userId)
+		user, err := users.ById(model.Id(userId))
 		if err != nil {
 			return err
 		}
@@ -30,7 +30,7 @@ var Profile = stackable.WrapFunc(
 		users := model.Users(ctx.Shared.DB)
 		userId := ctx.Request.PathValue("id")
 
-		user, err := users.ById(userId)
+		user, err := users.ById(model.Id(userId))
 		if err != nil {
 			return err
 		}

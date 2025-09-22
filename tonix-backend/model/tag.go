@@ -11,7 +11,6 @@ const (
 )
 
 type Tag struct {
-	Id     string `db:"id"`
 	Name   string `db:"name"`
 	Usages int    `db:"usages"`
 	Type   string `db:"type"`
@@ -44,22 +43,22 @@ func (t *TagFeatures) AddOrCreate(name string, tagType string) (*string, error) 
 	if foundTag != nil {
 		foundTag.Usages++
 
-		t.DB.Exec("UPDATE tags SET usages = $1 WHERE id = $2", foundTag.Usages, foundTag.Id)
+		t.DB.Exec("UPDATE tags SET usages = $1 WHERE name = $2", foundTag.Usages, foundTag.Name)
 
-		return &foundTag.Id, nil
+		return &foundTag.Name, nil
 	}
 
-	var userId string
+	var tagName string
 	row := t.DB.QueryRow(
-		"INSERT INTO tags (name, type) VALUES ($1, $2) RETURNING id",
+		"INSERT INTO tags (name, type) VALUES ($1, $2) RETURNING name",
 		name, tagType,
 	)
 
-	if err = row.Scan(&userId); err != nil {
+	if err = row.Scan(&tagName); err != nil {
 		return nil, err
 	}
 
-	return &userId, err
+	return &tagName, err
 }
 
 type SearchTagsOpts struct {

@@ -7,11 +7,11 @@ import (
 )
 
 type File struct {
-	Id        string    `db:"id"`
+	Id        Id        `db:"id"`
 	Filename  string    `db:"filename"`
 	Path      string    `db:"path"`
 	Mimetype  string    `db:"mimetype"`
-	AuthorId  string    `db:"author_id"`
+	AuthorId  Id        `db:"author_id"`
 	CreatedAt time.Time `db:"created_at"`
 }
 
@@ -23,14 +23,14 @@ func Files(db *sqlx.DB) *FileFeatures {
 	return &FileFeatures{DB: db}
 }
 
-func (f *FileFeatures) AddFile(file *File) (*string, error) {
+func (f *FileFeatures) AddFile(file *File) (*Id, error) {
 	query, err := f.DB.NamedQuery("INSERT INTO files (author_id, filename, path, mimetype) VALUES (:author_id, :filename, :path, :mimetype) RETURNING id", file)
 	if err != nil {
 		return nil, err
 	}
 
 	query.Next()
-	var id string
+	var id Id
 	if err = query.Scan(&id); err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (f *FileFeatures) AddFile(file *File) (*string, error) {
 	return &id, nil
 }
 
-func (f *FileFeatures) ById(fileId string) (*File, error) {
+func (f *FileFeatures) ById(fileId Id) (*File, error) {
 	var file File
 	if err := f.DB.Get(&file, "SELECT * FROM files WHERE id = $1", fileId); err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (f *FileFeatures) ById(fileId string) (*File, error) {
 	return &file, nil
 }
 
-func (f *FileFeatures) IsAuthor(userId string, fileId string) (bool, error) {
+func (f *FileFeatures) IsAuthor(userId Id, fileId Id) (bool, error) {
 	var fileIds []string = make([]string, 1)
 	if err := f.DB.Select(&fileIds, "SELECT * FROM files WHERE author_id = $1", userId); err != nil {
 		return false, err

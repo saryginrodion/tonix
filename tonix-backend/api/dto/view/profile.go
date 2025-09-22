@@ -24,7 +24,7 @@ type SelfUserView struct {
 
 func ToSelfUserView(u *model.User) SelfUserView {
 	return SelfUserView{
-		Id:                 u.Id,
+		Id:                 string(u.Id),
 		Email:              u.Email,
 		Username:           u.Username,
 		DisplayableName:    u.DisplayableName,
@@ -51,7 +51,7 @@ type UserView struct {
 
 func ToUserView(u *model.User) UserView {
 	return UserView{
-		Id:              u.Id,
+		Id:              string(u.Id),
 		Username:        u.Username,
 		DisplayableName: u.DisplayableName,
 		Description:     u.Description,
